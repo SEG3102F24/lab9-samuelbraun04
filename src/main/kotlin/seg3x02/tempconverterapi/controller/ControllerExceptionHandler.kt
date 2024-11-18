@@ -1,16 +1,28 @@
-package seg3x02.tempconverterapi.controller
+
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestControllerAdvice
+import java.io.PrintWriter
+import java.io.StringWriter
 
-@RestControllerAdvice
-class ControllerExceptionHandler {
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleException(ex: Exception): ResponseEntity<String> {
-        return ResponseEntity.badRequest().body("Unable to process request")
+@ControllerAdvice
+class GlobalExceptionHandler {
+
+    @ExceptionHandler(Exception::class)
+    fun handleAllExceptions(ex: Exception): ResponseEntity<String> {
+        
+        ex.printStackTrace()
+
+        
+        val sw = StringWriter()
+        ex.printStackTrace(PrintWriter(sw))
+        val exceptionAsString = sw.toString()
+
+        
+        val errorMessage = "An error occurred: ${ex.message}\n\n$exceptionAsString"
+
+        return ResponseEntity(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 }
